@@ -1,20 +1,48 @@
 \documentclass{article}
+\usepackage{tkz-euclide}
 \title{Dreieck}
 \setcounter{secnumdepth}{0}
 \begin{document}
 %%	 \maketitle
 	 \begin{section}{Trigonometrie}
+	 	\begin{tikzpicture}
+	 		\newcommand{\scale}{2}
+	 		%fixed points
+	 		
+	 		\tkzDefPoints{0/0/A,10/0/B,3.6/4.8/C}
+	 		\tkzDefPointBy[projection=onto A--B ](C) \tkzGetPoint{qp}
+	 		\tkzDefMidPoint(A,B)					 \tkzGetPoint{c}
+	 		\tkzDefMidPoint(B,C)					 \tkzGetPoint{a}
+	 		\tkzDefMidPoint(C,A)					 \tkzGetPoint{b}
+	 		\tkzDefMidPoint(C,qp)					 \tkzGetPoint{h}
+	 		
+	 		% Drawing
+	 		
+	 		\tkzDrawPolygon(A,B,C)
+	 		\tkzDrawSegments[dashed](C,qp)
+	 		\tkzDrawPoints(A,B,C)
+	 		%\tkzLabelPoints(A,B,qp)
+	 		%\tkzLabelPoints[above](C)
+	 		\tkzLabelPoints[above right,scale=\scale](a)
+	 		\tkzLabelPoints[scale=\scale](b,c,h)
+	 		\tkzMarkRightAngle(A,C,B)
+	 		\draw[thick] pic["$\theta$"scale=\scale,draw, thick , <->, angle eccentricity=2/3, angle radius=3.0cm] {angle=C--B--A};
+	 	\end{tikzpicture}
 	 	\begin{subsection}{Aufgabenstellung}
 	 		Schreiben Sie eine Anwendung welche zwei beliebige Angaben eines rechtwinkligen Dreiecks akzeptiert, und die restlichen Werte bestimmen kann.\\
 	 		Die Möglichen Angaben sind:
 	 		\begin{itemize}
-	 			\item Ankathete (an $\theta$)
-	 			\item Gegenkathete (gegenüber $\theta$)
-	 			\item $\theta$
-	 			\item Hypotenuse
-	 			\item Höhe (zur Hypotenuse)
+	 			\item Die Ankathete $a$
+	 			\item Die Gegenkathete $b$
+	 			\item Die Hypotenuse $c$
+	 			\item Die Höhe $h$
+	 			\item Der Winkel $\theta$
 	 		\end{itemize}
+ 			
 	 	\end{subsection}
-	 \end{section}
+	 	\begin{subsection}{Erweiterungen}
+	 		
+	 	\end{subsection}
+	\end{section}
 \end{document}
 

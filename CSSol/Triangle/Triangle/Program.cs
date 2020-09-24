@@ -6,20 +6,9 @@ namespace Triangle
     {
         static void Main(string[] args)
         {
-            String var;
-            float a, b;
-            Dreieck dreieck;
-            Console.WriteLine("Geben Sie zwei Katheten eines rechtwinkligen Dreiecks an.");
-            do {
-                Console.Write("Kathete a = ");
-                var = Console.ReadLine();
-            } while (!float.TryParse(var, out a));
-            do {
-                Console.Write("Kathete b = ");
-                var = Console.ReadLine();
-            } while (!float.TryParse(var, out b));
-            dreieck = new Dreieck(a, b);
-            Console.WriteLine("Gegebene Kathetenlängen waren {0} und {1}, errechnete Hypotenuse ist:  {2}.", dreieck.A(), dreieck.B(), dreieck.C());
+            //Console.WriteLine("Test: {0}", Math.Cos(Math.PI));
+            Dreieck testdreieck = Dreieck.Trigo(null, null, 2.82842712474619, null, Math.PI/4)[0];
+            Console.WriteLine("a: {0}, b: {1}, c: {2}", testdreieck.seiten[0], testdreieck.seiten[1], testdreieck.seiten[2]);
         }
     }
 }
