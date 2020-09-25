@@ -5,19 +5,25 @@ using System.Text;
 
 namespace Triangle
 {
-    public class Dreieck
+    public class RWDreieck
     {
-        public double[] seiten = new double[3];
-        public Dreieck (double a, double b, double c)
-            /*
-             * Kreiert ein Dreiecksobjekt aus drei gegebenen Seitenlängen.
-             */
+        private Dreieck dreieck;
+        public readonly double height;
+        public readonly double theta;
+        public Dreieck Dreieck()
         {
-            this.seiten[0] = a;
-            this.seiten[1] = b;
-            this.seiten[2] = c;
+            return dreieck.clone();
         }
-        public static Dreieck[] Trigo(Nullable<double> a, Nullable<double> b, Nullable<double> c, Nullable<double> h, Nullable<double> theta)
+
+        private RWDreieck (Dreieck dreieck)
+        {
+            this.dreieck = dreieck;
+            this.height = this.dreieck.Höhe()[2];
+            this.theta = Math.Acos(this.dreieck.seiten[0] / this.dreieck.seiten[2]);
+            Debug.Assert(invariant());
+        }
+
+        private static Dreieck[] Trigo(Nullable<double> a, Nullable<double> b, Nullable<double> c, Nullable<double> h, Nullable<double> theta)
         {
             int valuecount = 0;
             int index = -1;
@@ -33,7 +39,7 @@ namespace Triangle
                 {
                     valuecount++;
                     sides[1] = bval;
-                    return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { aval, bval, null })};
+                    return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { aval, bval, null }) };
                 }
                 else
                 {
@@ -63,7 +69,7 @@ namespace Triangle
                 {
                     if (c is double cval)
                     {
-                        valuecount++; 
+                        valuecount++;
                         sides[2] = cval;
                         index = 2;
                     }
@@ -82,7 +88,7 @@ namespace Triangle
                     if (index == 2)
                     {
 
-                        double var = Math.Pow(sides[2],2) - 4 * Math.Pow(hval, 4);
+                        double var = Math.Pow(sides[2], 2) - 4 * Math.Pow(hval, 4);
 
                         if (var > 0)
                         {
@@ -90,8 +96,8 @@ namespace Triangle
                             double q = (sides[2] + var) / 2;
                             double p = (sides[2] - var) / 2;
 
-                            sol[0] = Dreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2,sides[2]);
-                            sol[1] = Dreieck.Rechtwinklig(new double?[] { hval, p, null }).strecken(2,sides[2]);
+                            sol[0] = Dreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2, sides[2]);
+                            sol[1] = Dreieck.Rechtwinklig(new double?[] { hval, p, null }).strecken(2, sides[2]);
                             return sol;
                         }
                         else if (var == 0)
@@ -144,6 +150,53 @@ namespace Triangle
                 }
             }
         }
+
+        private bool invariant()
+            /*
+             * Die Invariante muss immer wahr sein.
+             * Konkret wird geprüft ob das RWDreieck rechtwinklig ist.
+             */
+        {
+            return Math.Abs(
+                    this.dreieck.seiten[0] * this.dreieck.seiten[0]
+                    + this.dreieck.seiten[1] * this.dreieck.seiten[1]
+                    - this.dreieck.seiten[2] * this.dreieck.seiten[2]
+                ) <= double.Epsilon;
+        }
+    }
+
+    public class Dreieck
+    {
+        public double[] seiten = new double[3];
+        public Dreieck (double a, double b, double c)
+            /*
+             * Kreiert ein Dreiecksobjekt aus drei gegebenen Seitenlängen.
+             */
+        {
+            this.seiten[0] = a;
+            this.seiten[1] = b;
+            this.seiten[2] = c;
+        }
+        public Dreieck (double[] seiten)
+        {
+            if (seiten.Length < 3)
+            {
+                throw new ArgumentException("`seiten' enthält night genügend Elemente");
+            }
+            else
+            {
+                for (int c = 0; c < 3; c++)
+                {
+                    this.seiten[c] = seiten[c];
+                } 
+            }
+        }
+
+        public Dreieck clone()
+        {
+            return new Dreieck(this.seiten);
+        }
+
         public static Dreieck Rechtwinklig(double? a, double? b, double? c)
             /*
              * Konstruiert ein neues rechtwinkliges Dreieckselement aus mindestens zwei gegebenen Seiten.
@@ -277,5 +330,6 @@ namespace Triangle
             }
             return resultat;
         }
+
     }
 }
