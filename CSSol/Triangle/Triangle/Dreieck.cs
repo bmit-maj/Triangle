@@ -20,7 +20,71 @@ namespace Triangle
             this.dreieck = dreieck;
             this.height = this.dreieck.Höhe()[2];
             this.theta = Math.Acos(this.dreieck.seiten[0] / this.dreieck.seiten[2]);
-            Debug.Assert(invariant());
+            Debug.Assert(Invariant());
+        }
+        public static Dreieck Rechtwinklig(double? a, double? b, double? c)
+        /*
+         * Konstruiert ein neues rechtwinkliges Dreieckselement aus mindestens zwei gegebenen Seiten.
+         * Argument `a' und `b' sind Katheten (seitenindex 0 bzw. 1).
+         * Argument `c' ist die Hypothenuse (seitenindex 2).
+         * höchstens eines der Argumente darf null sein. Das fehlende Argument wird berechnet.
+         */
+        {
+            return Rechtwinklig(new double?[] { a, b, c });
+        }
+        public static Dreieck Rechtwinklig(double?[] seiten)
+        /*
+         * Konstruiert ein neues rechtwinkliges Dreieckselement aus mindestens zwei gegebenen Seiten.
+         * `seiten.Length()' muss mindestens 3 betragen.
+         * `seiten[0]' und `seiten[1]' sind die Katheten.
+         * `seiten[2]' ist die Hypothenuse.
+         * höchstens eines der der ersten drei Einträge von `seiten' darf null sein. Die fehlende Seite wird berechnet.
+         */
+        {
+            double[] newval = new double[3];
+            int nullcounter = 0;
+            int nullindex = -1;
+
+            if (seiten.Length < 3)
+            {
+                throw new ArgumentException("Argument `seiten' ist zu kurz; ihre länge muss (mindestens) 3 betragen");
+            }
+
+            for (int c = 0; c < 3; c++)
+            {
+                if (seiten[c] is double curval)
+                {
+                    newval[c] = curval;
+                }
+                else
+                {
+                    nullcounter++;
+                    nullindex = c;
+                }
+            }
+
+            if (nullcounter > 1)
+            {
+                throw new ArgumentNullException();
+            }
+
+            Debug.Assert(nullindex >= 0 && nullindex < 3);
+
+            if (nullcounter == 1)
+            {
+                double a = newval[(nullindex + 1) % 3];
+                double b = newval[(nullindex + 2) % 3];
+                if (nullindex == 2)
+                {
+                    newval[nullindex] = Math.Sqrt((a * a) + (b * b));
+                }
+                else
+                {
+                    newval[nullindex] = Math.Sqrt(Math.Abs((a * a) - (b * b)));
+                }
+            }
+
+            return new Dreieck(newval[0], newval[1], newval[2]);
         }
 
         private static Dreieck[] Trigo(Nullable<double> a, Nullable<double> b, Nullable<double> c, Nullable<double> h, Nullable<double> theta)
@@ -39,7 +103,7 @@ namespace Triangle
                 {
                     valuecount++;
                     sides[1] = bval;
-                    return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { aval, bval, null }) };
+                    return new Dreieck[] { RWDreieck.Rechtwinklig(new double?[] { aval, bval, null }) };
                 }
                 else
                 {
@@ -47,7 +111,7 @@ namespace Triangle
                     {
                         sides[2] = cval;
                         valuecount++;
-                        return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { aval, null, cval }) };
+                        return new Dreieck[] { RWDreieck.Rechtwinklig(new double?[] { aval, null, cval }) };
                     }
                 }
             }
@@ -62,7 +126,7 @@ namespace Triangle
                     {
                         valuecount++;
                         sides[2] = cval;
-                        return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { null, bval, cval }) };
+                        return new Dreieck[] { RWDreieck.Rechtwinklig(new double?[] { null, bval, cval }) };
                     }
                 }
                 else
@@ -96,15 +160,15 @@ namespace Triangle
                             double q = (sides[2] + var) / 2;
                             double p = (sides[2] - var) / 2;
 
-                            sol[0] = Dreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2, sides[2]);
-                            sol[1] = Dreieck.Rechtwinklig(new double?[] { hval, p, null }).strecken(2, sides[2]);
+                            sol[0] = RWDreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2, sides[2]);
+                            sol[1] = RWDreieck.Rechtwinklig(new double?[] { hval, p, null }).strecken(2, sides[2]);
                             return sol;
                         }
                         else if (var == 0)
                         {
                             Dreieck[] sol = new Dreieck[1];
                             double q = sides[2] / 2;
-                            sol[0] = Dreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2, sides[2]);
+                            sol[0] = RWDreieck.Rechtwinklig(new double?[] { q, hval, null }).strecken(2, sides[2]);
                             return sol;
                         }
                         else
@@ -114,12 +178,12 @@ namespace Triangle
                     }
                     else if (index == 1)
                     {
-                        return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { hval, null, sides[1] }).strecken(1, sides[1]) };
+                        return new Dreieck[] { RWDreieck.Rechtwinklig(new double?[] { hval, null, sides[1] }).strecken(1, sides[1]) };
                     }
                     else
                     {
                         Debug.Assert(index == 0);
-                        return new Dreieck[] { Dreieck.Rechtwinklig(new double?[] { null, hval, sides[0] }).strecken(0, sides[0]) };
+                        return new Dreieck[] { RWDreieck.Rechtwinklig(new double?[] { null, hval, sides[0] }).strecken(0, sides[0]) };
                     }
                 }
                 else
@@ -142,7 +206,7 @@ namespace Triangle
                 if (theta is double thetaval)
                 {
                     Debug.Assert(index >= 0 && index < 3);
-                    return new Dreieck[] { Dreieck.ThetaEinheit(thetaval).strecken(index, sides[index]) };
+                    return new Dreieck[] { Triangle.Dreieck.ThetaEinheit(thetaval).strecken(index, sides[index]) };
                 }
                 else
                 {
@@ -151,7 +215,7 @@ namespace Triangle
             }
         }
 
-        private bool invariant()
+        private bool Invariant()
             /*
              * Die Invariante muss immer wahr sein.
              * Konkret wird geprüft ob das RWDreieck rechtwinklig ist.
@@ -197,70 +261,7 @@ namespace Triangle
             return new Dreieck(this.seiten);
         }
 
-        public static Dreieck Rechtwinklig(double? a, double? b, double? c)
-            /*
-             * Konstruiert ein neues rechtwinkliges Dreieckselement aus mindestens zwei gegebenen Seiten.
-             * Argument `a' und `b' sind Katheten (seitenindex 0 bzw. 1).
-             * Argument `c' ist die Hypothenuse (seitenindex 2).
-             * höchstens eines der Argumente darf null sein. Das fehlende Argument wird berechnet.
-             */
-        {
-            return Rechtwinklig(new double?[] { a, b, c });
-        }
-        public static Dreieck Rechtwinklig (double?[] seiten)
-            /*
-             * Konstruiert ein neues rechtwinkliges Dreieckselement aus mindestens zwei gegebenen Seiten.
-             * `seiten.Length()' muss mindestens 3 betragen.
-             * `seiten[0]' und `seiten[1]' sind die Katheten.
-             * `seiten[2]' ist die Hypothenuse.
-             * höchstens eines der der ersten drei Einträge von `seiten' darf null sein. Die fehlende Seite wird berechnet.
-             */
-        {
-            double[] newval = new double[3];
-            int nullcounter = 0;
-            int nullindex = -1;
 
-            if (seiten.Length < 3)
-            {
-                throw new ArgumentException("Argument `seiten' ist zu kurz; ihre länge muss (mindestens) 3 betragen");
-            }
-
-            for (int c = 0; c < 3; c++) 
-            {
-                if (seiten[c] is double curval)
-                {
-                    newval[c] = curval;
-                }
-                else
-                {
-                    nullcounter++;
-                    nullindex = c;
-                }
-            }
-
-            if (nullcounter > 1)
-            {
-                throw new ArgumentNullException();
-            }
-
-            Debug.Assert(nullindex >= 0 && nullindex < 3);
-
-            if (nullcounter == 1)
-            {
-                double a = newval[(nullindex + 1) % 3];
-                double b = newval[(nullindex + 2) % 3];
-                if (nullindex == 2)
-                {
-                    newval[nullindex] = Math.Sqrt((a * a) + (b * b));
-                }
-                else
-                {
-                    newval[nullindex] = Math.Sqrt(Math.Abs((a * a) - (b * b)));
-                }
-            }
-
-            return new Dreieck(newval[0], newval[1], newval[2]);
-        }
         public static Dreieck ThetaEinheit(double theta)
             /*
              * Konstruiert das rechtwinklige, im Einheitskreis eingepasste, durch `theta' definierte Dreieckselement.
